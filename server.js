@@ -12,7 +12,7 @@ CONFIGURATION
 ========================================== */
 
 const API_URL = "https://backend.api-wa.co/campaign/neodove/api/v2";
-const API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5MTcxNjE0OGQyZDk2MGQzZmVhZjNmMSIsIm5hbWUiOiJCWFEgPD4gTWlnaHR5IEh1bmRyZWQgVGVjaG5vbG9naWVzIFB2dCBMdGQiLCJhcHBOYW1lIjoiQWlTZW5zeSIsImNsaWVudElkIjoiNjkxNzE2MTQ4ZDJkOTYwZDNmZWFmM2VhIiwiYWN0aXZlUGxhbiI6Ik5PTkUiLCJpYXQiOjE3NjMxMjA2NjB9.8jOtIkz5c455LWioAa7WNzvjXlqCN564TzM12yQQ5Cw";
+const API_KEY = "PASTE_YOUR_API_KEY_HERE";
 
 /* ==========================================
 HEALTH CHECK
@@ -49,7 +49,7 @@ const payload = {
         otpCode
     ],
 
-    source: "new-landing-page form",
+    source: "AFCAT 2026 Website",
 
     media: {},
 
@@ -77,6 +77,7 @@ const payload = {
 };
 
 try {
+
     const response = await axios.post(
         API_URL,
         payload,
@@ -104,7 +105,7 @@ try {
 
     res.status(500).json({
         success: false,
-        message: "Failed to Send OTP",
+        message: "Failed To Send OTP",
         error: error.response?.data || error.message
     });
 }
@@ -113,7 +114,7 @@ try {
 });
 
 /* ==========================================
-SERVER START
+START SERVER
 ========================================== */
 
 const PORT = process.env.PORT || 3000;
