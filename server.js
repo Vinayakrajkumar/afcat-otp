@@ -40,7 +40,7 @@ const { phoneNumber, userName, otpCode } = req.body;
         });
     }
 
-    console.log(`Sending OTP ${otpCode} to ${phoneNumber}`);
+   console.log(`Sending OTP ${otpCode} to ${phoneNumber}`);
 
     const payload = {
         apiKey: API_KEY,
