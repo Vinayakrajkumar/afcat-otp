@@ -21,7 +21,7 @@ const API_KEY = process.env.API_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ
 // ==========================================
 
 app.get("/", (req, res) => {
-res.send("AFCAT OTP Server Running Successfully");
+    res.send("AFCAT OTP Server Running Successfully");
 });
 
 // ==========================================
@@ -29,87 +29,83 @@ res.send("AFCAT OTP Server Running Successfully");
 // ==========================================
 
 app.post("/send-otp", async (req, res) => {
-try {
-const { phoneNumber, userName, otpCode } = req.body;
+    try {
+        const { phoneNumber, userName, otpCode } = req.body;
 
-```
-    if (!phoneNumber || !otpCode) {
-        return res.status(400).json({
+        if (!phoneNumber || !otpCode) {
+            return res.status(400).json({
+                success: false,
+                message: "phoneNumber and otpCode are required"
+            });
+        }
+
+        console.log(`Sending OTP ${otpCode} to ${phoneNumber}`);
+
+        const payload = {
+            apiKey: API_KEY,
+            campaignName: "OTP5",
+            destination: phoneNumber,
+            userName: userName || "Valued User",
+
+            templateParams: [
+                otpCode
+            ],
+
+            source: "AFCAT 2026 Website",
+
+            media: {},
+
+            buttons: [
+                {
+                    type: "button",
+                    sub_type: "url",
+                    index: 0,
+                    parameters: [
+                        {
+                            type: "text",
+                            text: otpCode
+                        }
+                    ]
+                }
+            ],
+
+            carouselCards: [],
+            location: {},
+            attributes: {},
+
+            paramsFallbackValue: {
+                FirstName: "user"
+            }
+        };
+
+        const response = await axios.post(
+            API_URL,
+            payload,
+            {
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            }
+        );
+
+        return res.status(200).json({
+            success: true,
+            message: "OTP Sent Successfully",
+            data: response.data
+        });
+
+    } catch (error) {
+        console.error(
+            "Error Sending OTP:",
+            error.response?.data || error.message
+        );
+
+        return res.status(500).json({
             success: false,
-            message: "phoneNumber and otpCode are required"
+            message: "Failed To Send OTP",
+            error: error.response?.data || error.message
         });
     }
-
-   console.log(`Sending OTP ${otpCode} to ${phoneNumber}`);
-
-    const payload = {
-        apiKey: API_KEY,
-        campaignName: "OTP5",
-        destination: phoneNumber,
-        userName: userName || "Valued User",
-
-        templateParams: [
-            otpCode
-        ],
-
-        source: "AFCAT 2026 Website",
-
-        media: {},
-
-        buttons: [
-            {
-                type: "button",
-                sub_type: "url",
-                index: 0,
-                parameters: [
-                    {
-                        type: "text",
-                        text: otpCode
-                    }
-                ]
-            }
-        ],
-
-        carouselCards: [],
-        location: {},
-        attributes: {},
-
-        paramsFallbackValue: {
-            FirstName: "user"
-        }
-    };
-
-    const response = await axios.post(
-        API_URL,
-        payload,
-        {
-            headers: {
-                "Content-Type": "application/json"
-            }
-        }
-    );
-
-    return res.status(200).json({
-        success: true,
-        message: "OTP Sent Successfully",
-        data: response.data
-    });
-
-} catch (error) {
-
-    console.error(
-        "Error Sending OTP:",
-        error.response?.data || error.message
-    );
-
-    return res.status(500).json({
-        success: false,
-        message: "Failed To Send OTP",
-        error: error.response?.data || error.message
-    });
-}
-```
-
 });
 
 // ==========================================
@@ -119,5 +115,5 @@ const { phoneNumber, userName, otpCode } = req.body;
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-console.log(`Server running on port ${PORT}`);
+    console.log(`Server running on port ${PORT}`);
 });
