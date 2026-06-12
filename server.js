@@ -45,7 +45,7 @@ app.post("/send-otp", async (req, res) => {
             destination: phoneNumber,
             userName: userName || "Valued User",
             templateParams: [otpCode],
-            source: "AFCAT 2026 Web Leads", 
+            source: "AFCAT 2026 Website", // <-- REVERTED TO ORIGINAL WORKING NAME
             media: {},
             buttons: [
                 { type: "button", sub_type: "url", index: 0, parameters: [{ type: "text", text: otpCode }] }
@@ -74,9 +74,8 @@ app.post("/submit-lead", async (req, res) => {
     try {
         const { name, qualification, city, school, course, phone } = req.body;
 
-        console.log(`Pushing lead to NeoDove for: ${name}`);
+        console.log(`Pushing lead to NeoDove for: ${name} with phone: ${phone}`);
 
-        // NeoDove expects strict 10-digit phone format for Indian numbers
         let cleanPhone = phone.trim();
         if (cleanPhone.startsWith("+91")) {
             cleanPhone = cleanPhone.replace("+91", "");
@@ -84,15 +83,14 @@ app.post("/submit-lead", async (req, res) => {
             cleanPhone = cleanPhone.substring(2);
         }
 
-        // EXACT DEFINITION FOR NEODOVE CUSTOM INTEGRATION
         const payload = {
             "name": name,
             "mobile": cleanPhone,
-            "Qualification": qualification, // Matches standard casing
-            "City": city,                   // Matches standard casing
+            "Qualification": qualification, 
+            "City": city,                   
             "School": school,
             "Course": course,
-            "Source": "AFCAT 2026 Web Leads"
+            "Source": "AFCAT 2026 Web Leads" // <-- KEPT THIS FOR THE CRM
         };
 
         const response = await axios.post(NEODOVE_WEBHOOK_URL, payload, {
