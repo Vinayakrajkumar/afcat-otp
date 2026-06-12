@@ -26,7 +26,7 @@ app.get("/", (req, res) => {
 });
 
 // ==========================================
-// ROUTE 1: SEND OTP VIA WHATSAPP
+// ROUTE 1: SEND OTP VIA WHATSAPP (Needs 91)
 // ==========================================
 
 app.post("/send-otp", async (req, res) => {
@@ -42,7 +42,7 @@ app.post("/send-otp", async (req, res) => {
         const payload = {
             apiKey: API_KEY,
             campaignName: "OTP5", 
-            destination: phoneNumber,
+            destination: phoneNumber, // The frontend already adds "91" for this specific route
             userName: userName || "Valued User",
             templateParams: [otpCode],
             source: "AFCAT 2026 Web Leads", 
@@ -67,32 +67,26 @@ app.post("/send-otp", async (req, res) => {
 });
 
 // ==========================================
-// ROUTE 2: SUBMIT LEAD TO NEODOVE
+// ROUTE 2: SUBMIT LEAD TO NEODOVE (Strict 10 Digits)
 // ==========================================
 
 app.post("/submit-lead", async (req, res) => {
     try {
         const { name, qualification, city, school, course, phone } = req.body;
 
-        console.log(`Pushing lead to NeoDove for: ${name}`);
+        console.log(`Pushing lead to NeoDove for: ${name} with phone: ${phone}`);
 
-        // Ensure the phone number has the 91 country code for NeoDove
-        let formattedPhone = phone;
-        if (!formattedPhone.startsWith("91") && !formattedPhone.startsWith("+91")) {
-            formattedPhone = "91" + formattedPhone;
-        }
-
-        // PERFECTLY MATCHED TO NEODOVE WITHOUT EMAIL
+        // MATCHED EXACTLY TO YOUR NEODOVE SCREENSHOT (No "91", just the raw 10 digits)
         const payload = {
-            name: name,                // Matches 'name' in your mapping
-            mobile: formattedPhone,    // Matches 'mobile' in your mapping
+            "name": name,
+            "mobile": phone, 
             
-            // Sending the extra data exactly how NeoDove's documentation requests it
-            detail1: course,
-            detail2: qualification,
-            detail3: city,
-            detail4: school,
-            source: "AFCAT 2026 Web Leads"
+            // Passing extra form data safely as details, exactly as the NeoDove documentation requires
+            "detail1": course,
+            "detail2": qualification,
+            "detail3": city,
+            "detail4": school,
+            "detail5": "AFCAT 2026 Web Leads"
         };
 
         const response = await axios.post(NEODOVE_WEBHOOK_URL, payload, {
