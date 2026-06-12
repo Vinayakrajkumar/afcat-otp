@@ -14,8 +14,8 @@ app.use(cors());
 const API_URL = "https://backend.api-wa.co/campaign/neodove/api/v2";
 const API_KEY = process.env.API_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5MTcxNjE0OGQyZDk2MGQzZmVhZjNmMSIsIm5hbWUiOiJCWFEgPD4gTWlnaHR5IEh1bmRyZWQgVGVjaG5vbG9naWVzIFB2dCBMdGQiLCJhcHBOYW1lIjoiQWlTZW5zeSIsImNsaWVudElkIjoiNjkxNzE2MTQ4ZDJkOTYwZDNmZWFmM2VhIiwiYWN0aXZlUGxhbiI6Ik5PTkUiLCJpYXQiOjE3NjMxMjA2NjB9.8jOtIkz5c455LWioAa7WNzvjXlqCN564TzM12yQQ5Cw";
 
-// PUT YOUR ACTUAL NEODOVE INCOMING WEBHOOK LINK HERE
-const NEODOVE_WEBHOOK_URL = process.env.NEODOVE_WEBHOOK_URL || "YOUR_NEODOVE_WEBHOOK_URL_HERE";
+// YOUR REAL NEODOVE WEBHOOK URL
+const NEODOVE_WEBHOOK_URL = process.env.NEODOVE_WEBHOOK_URL || "https://a0ec63eb-996d-4e81-92a9-b8a7b2d8e3e7.neodove.com/integration/custom/f19530e1-c7e3-4e95-8b7b-e4afe794ecdd/leads";
 
 // ==========================================
 // HEALTH CHECK
@@ -72,26 +72,39 @@ app.post("/send-otp", async (req, res) => {
 
 app.post("/submit-lead", async (req, res) => {
     try {
-        // Receive all the fields from your HTML form
         const { name, qualification, city, school, course, phone } = req.body;
 
         console.log(`Pushing lead to NeoDove for: ${name}`);
 
-        // Send the data to your NeoDove Webhook
-        const response = await axios.post(NEODOVE_WEBHOOK_URL, {
-            name: name,
-            mobile: phone,
-            qualification: qualification,
-            city: city,
-            school: school,
-            course: course,
-            source: "AFCAT Admission Landing Page"
+        // Ensure the phone number has the 91 country code for NeoDove
+        let formattedPhone = phone;
+        if (!formattedPhone.startsWith("91") && !formattedPhone.startsWith("+91")) {
+            formattedPhone = "91" + formattedPhone;
+        }
+
+        // NeoDove expects an array of objects for most webhook configurations
+        const payload = [
+            {
+                name: name,
+                mobile: formattedPhone, // Now safely includes the country code
+                qualification: qualification,
+                city: city,
+                school: school,
+                course: course,
+                source: "AFCAT Admission Landing Page"
+            }
+        ];
+
+        const response = await axios.post(NEODOVE_WEBHOOK_URL, payload, {
+            headers: { "Content-Type": "application/json" }
         });
 
+        console.log("NeoDove Success Response:", response.data);
         return res.status(200).json({ success: true, message: "Lead saved successfully" });
 
     } catch (error) {
-        console.error("Error saving to NeoDove:", error.message);
+        // This will now print the EXACT reason NeoDove rejected the lead
+        console.error("Error saving to NeoDove:", error.response?.data || error.message);
         return res.status(500).json({ success: false, message: "Failed to save lead" });
     }
 });
