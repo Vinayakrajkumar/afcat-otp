@@ -41,7 +41,7 @@ app.post("/send-otp", async (req, res) => {
 
         const payload = {
             apiKey: API_KEY,
-            campaignName: "OTP5", // Keep this as OTP5 for WhatsApp templates
+            campaignName: "OTP5", 
             destination: phoneNumber,
             userName: userName || "Valued User",
             templateParams: [otpCode],
@@ -82,15 +82,17 @@ app.post("/submit-lead", async (req, res) => {
             formattedPhone = "91" + formattedPhone;
         }
 
-        // Sending a flat JSON Object with the exact campaign name
+        // PERFECTLY MATCHED TO NEODOVE WITHOUT EMAIL
         const payload = {
-            name: name,
-            mobile: formattedPhone,
-            qualification: qualification,
-            city: city,
-            school: school,
-            course: course,
-            source: "AFCAT 2026 Web Leads" // Updated campaign name tag
+            name: name,                // Matches 'name' in your mapping
+            mobile: formattedPhone,    // Matches 'mobile' in your mapping
+            
+            // Sending the extra data exactly how NeoDove's documentation requests it
+            detail1: course,
+            detail2: qualification,
+            detail3: city,
+            detail4: school,
+            source: "AFCAT 2026 Web Leads"
         };
 
         const response = await axios.post(NEODOVE_WEBHOOK_URL, payload, {
