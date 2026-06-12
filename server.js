@@ -41,11 +41,11 @@ app.post("/send-otp", async (req, res) => {
 
         const payload = {
             apiKey: API_KEY,
-            campaignName: "OTP5",
+            campaignName: "OTP5", // Keep this as OTP5 for WhatsApp templates
             destination: phoneNumber,
             userName: userName || "Valued User",
             templateParams: [otpCode],
-            source: "AFCAT 2026 Website",
+            source: "AFCAT 2026 Web Leads", 
             media: {},
             buttons: [
                 { type: "button", sub_type: "url", index: 0, parameters: [{ type: "text", text: otpCode }] }
@@ -82,18 +82,16 @@ app.post("/submit-lead", async (req, res) => {
             formattedPhone = "91" + formattedPhone;
         }
 
-        // NeoDove expects an array of objects for most webhook configurations
-        const payload = [
-            {
-                name: name,
-                mobile: formattedPhone, // Now safely includes the country code
-                qualification: qualification,
-                city: city,
-                school: school,
-                course: course,
-                source: "AFCAT Admission Landing Page"
-            }
-        ];
+        // Sending a flat JSON Object with the exact campaign name
+        const payload = {
+            name: name,
+            mobile: formattedPhone,
+            qualification: qualification,
+            city: city,
+            school: school,
+            course: course,
+            source: "AFCAT 2026 Web Leads" // Updated campaign name tag
+        };
 
         const response = await axios.post(NEODOVE_WEBHOOK_URL, payload, {
             headers: { "Content-Type": "application/json" }
@@ -103,7 +101,6 @@ app.post("/submit-lead", async (req, res) => {
         return res.status(200).json({ success: true, message: "Lead saved successfully" });
 
     } catch (error) {
-        // This will now print the EXACT reason NeoDove rejected the lead
         console.error("Error saving to NeoDove:", error.response?.data || error.message);
         return res.status(500).json({ success: false, message: "Failed to save lead" });
     }
